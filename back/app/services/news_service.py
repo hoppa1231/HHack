@@ -20,16 +20,3 @@ class NewsService:
             summary="news summary"
         )
         return response
-    
-class UserService:
-    def register(self, data : Register) -> TokenResponse:
-        response = TokenResponse(
-            access_token='token example'
-        )
-        return response
-
-    def login(self, data : Login) -> TokenResponse:
-        response = TokenResponse(
-            access_token = 'token example'
-        )
-        return response
