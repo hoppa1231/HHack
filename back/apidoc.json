@@ -1,0 +1,258 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "News API",
+    "description": "API для работы с новостями и пользователями",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000/api",
+      "description": "Development server"
+    }
+  ],
+  "paths": {
+    "/news": {
+      "post": {
+        "summary": "Получить новости",
+        "description": "Возвращает список новостей за указанный период для пользователя",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NewsRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ со списком новостей",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации входных данных"
+          }
+        }
+      }
+    },
+    "/summary": {
+      "post": {
+        "summary": "Получить сводку новости",
+        "description": "Возвращает полную сводку конкретной новости",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SummaryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешный ответ со сводкой новости",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SummaryResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации входных данных"
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "summary": "Регистрация пользователя",
+        "description": "Регистрирует нового пользователя и возвращает токен",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Register"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешная регистрация",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации входных данных"
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "summary": "Авторизация пользователя",
+        "description": "Авторизует пользователя и возвращает токен",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Login"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Успешная авторизация",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Ошибка валидации входных данных"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Register": {
+        "type": "object",
+        "required": ["name", "preferences"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "имя пользователя"
+          },
+          "preferences": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Список тегов предпочтений"
+          }
+        }
+      },
+      "Login": {
+        "type": "object",
+        "required": ["name"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "имя пользователя"
+          }
+        }
+      },
+      "TokenResponse": {
+        "type": "object",
+        "required": ["access_token"],
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT-токен для авторизации"
+          }
+        }
+      },
+      "NewsPeriod": {
+        "type": "string",
+        "enum": ["day", "week", "month"],
+        "description": "Период за который нужно получить сводку новостей"
+      },
+      "NewsRequest": {
+        "type": "object",
+        "required": ["user_id", "news_period"],
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "description": "id пользователя"
+          },
+          "news_period": {
+            "$ref": "#/components/schemas/NewsPeriod"
+          }
+        }
+      },
+      "News": {
+        "type": "object",
+        "required": ["news_id", "img_url", "header", "mini_description"],
+        "properties": {
+          "news_id": {
+            "type": "integer",
+            "description": "id новости"
+          },
+          "img_url": {
+            "type": "string",
+            "description": "Ссылка на картинку новости"
+          },
+          "header": {
+            "type": "string",
+            "description": "Заголовок новости"
+          },
+          "mini_description": {
+            "type": "string",
+            "description": "Краткое описание новости"
+          }
+        }
+      },
+      "NewsResponse": {
+        "type": "object",
+        "required": ["news"],
+        "properties": {
+          "news": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/News"
+            },
+            "description": "Список новостей"
+          }
+        }
+      },
+      "SummaryRequest": {
+        "type": "object",
+        "required": ["news_id"],
+        "properties": {
+          "news_id": {
+            "type": "integer",
+            "description": "id новости"
+          }
+        }
+      },
+      "SummaryResponse": {
+        "type": "object",
+        "required": ["header", "summary"],
+        "properties": {
+          "header": {
+            "type": "string",
+            "description": "Заголовок новости"
+          },
+          "summary": {
+            "type": "string",
+            "description": "Сводка новости"
+          }
+        }
+      }
+    }
+  }
+}

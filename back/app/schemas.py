@@ -4,6 +4,7 @@ from enum import Enum
 
 class Register(BaseModel):
     name: str = Field(description="имя пользователя")
+    password: str = Field(description="пароль пользователя")
     preferences: List[str] = Field(description="Список тегов предпочтений")
 
 class Login(BaseModel):

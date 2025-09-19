@@ -1,7 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from app.services import NewsService, UserService
+from app.services import UserService, NewsService
+from app.config import Config
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -10,9 +11,9 @@ migrate = Migrate()
 news_service = NewsService()
 user_service = UserService()
 
-def create_app(config_class) -> Flask:
+def create_app() -> Flask:
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(Config)
 
     # Инициализация расширений
     db.init_app(app)
