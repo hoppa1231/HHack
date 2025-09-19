@@ -1,9 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from app.services import NewsService, UserService
 
 db = SQLAlchemy()
 migrate = Migrate()
+
+# Создаем сервисы
+news_service = NewsService()
+user_service = UserService()
 
 def create_app(config_class) -> Flask:
     app = Flask(__name__)
