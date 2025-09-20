@@ -9,6 +9,7 @@ class Preference(Enum):
     SCIENCE = 'science'
 
 class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
     password = db.Column(db.String(100))
     preferences = db.Column(db.String(100), default='')
