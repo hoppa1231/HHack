@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Grand News — клиент</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="app-header">
+        <h1>Grand News</h1>
+        <div class="app-header__status">
+          <span id="auth-status">Не авторизованы</span>
+          <button id="logout" class="link-button" type="button">Выйти</button>
+        </div>
+      </header>
+
+      <main class="app-main">
+        <section class="panel">
+          <h2>Регистрация</h2>
+          <p class="panel__hint">
+            Создайте пользователя и выберите интересующие тематики. После
+            успешной регистрации вы получите токен, который будет автоматически
+            сохранён во фронтенде.
+          </p>
+          <form id="register-form" class="form" autocomplete="off">
+            <label class="form__field">
+              <span>Имя</span>
+              <input type="text" name="name" required placeholder="newslover" />
+            </label>
+            <label class="form__field">
+              <span>Пароль</span>
+              <input
+                type="password"
+                name="password"
+                required
+                placeholder="••••••••"
+              />
+            </label>
+            <fieldset class="form__field">
+              <legend>Предпочтения</legend>
+              <div class="checkbox-grid">
+                <label>
+                  <input type="checkbox" name="preferences" value="sport" /> Спорт
+                </label>
+                <label>
+                  <input type="checkbox" name="preferences" value="music" /> Музыка
+                </label>
+                <label>
+                  <input type="checkbox" name="preferences" value="movie" /> Кино
+                </label>
+                <label>
+                  <input type="checkbox" name="preferences" value="politics" /> Политика
+                </label>
+                <label>
+                  <input type="checkbox" name="preferences" value="science" /> Наука
+                </label>
+              </div>
+            </fieldset>
+            <button class="primary-button" type="submit">Зарегистрироваться</button>
+          </form>
+        </section>
+
+        <section class="panel">
+          <h2>Вход</h2>
+          <p class="panel__hint">
+            Авторизуйтесь по имени пользователя, чтобы получать новости и
+            сводки. Токен отобразится в верхней панели.
+          </p>
+          <form id="login-form" class="form" autocomplete="off">
+            <label class="form__field">
+              <span>Имя</span>
+              <input type="text" name="name" required placeholder="newslover" />
+            </label>
+            <button class="primary-button" type="submit">Войти</button>
+          </form>
+        </section>
+
+        <section class="panel panel--wide">
+          <div class="panel__header">
+            <h2>Лента новостей</h2>
+            <span id="active-token" class="token-badge" title="JWT токен"></span>
+          </div>
+          <form id="news-form" class="form form--inline" autocomplete="off">
+            <label class="form__field">
+              <span>ID пользователя</span>
+              <input
+                type="number"
+                name="userId"
+                min="1"
+                required
+                placeholder="1"
+              />
+            </label>
+            <label class="form__field">
+              <span>Период</span>
+              <select name="period" required>
+                <option value="day">Сегодня</option>
+                <option value="week">Неделя</option>
+                <option value="month">Месяц</option>
+              </select>
+            </label>
+            <button class="primary-button" type="submit">Загрузить новости</button>
+          </form>
+
+          <div id="news-results" class="news-list" role="list"></div>
+        </section>
+      </main>
+
+      <aside id="message" class="toast" aria-live="polite" hidden></aside>
+    </div>
+
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
