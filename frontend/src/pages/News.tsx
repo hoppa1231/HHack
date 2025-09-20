@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../api/news";
+import NewsDeck from "../shared/news_desk";
+
 
 type Period = "day" | "week" | "month";
 
@@ -33,6 +35,7 @@ export default function News() {
         </select>
         <button onClick={() => getNews.mutate()} disabled={getNews.isPending}>Load</button>
       </div>
+      <NewsDeck/>
 
       {getNews.isError && <p style={{color:"crimson"}}>Failed to load news</p>}
       {getNews.isSuccess && getNews.data.news.length === 0 && <p>No news</p>}
