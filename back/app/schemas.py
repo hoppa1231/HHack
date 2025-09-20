@@ -17,8 +17,8 @@ class TokenResponse(BaseModel):
     access_token: str = Field(description="JWT-токен для авторизации")
 
 class NewsPeriod(Enum):
-    DAY = "day",
-    WEEK = "week",
+    DAY = "day"
+    WEEK = "week"
     MONTH = "month"
 
 class NewsRequest(BaseModel):
@@ -38,5 +38,5 @@ class SummaryRequest(BaseModel):
     news_id: int = Field(description="id новости")
 
 class SummaryResponse(BaseModel):
-    header: str = Field(description="Заголовок новости"),
+    header: str = Field(description="Заголовок новости")
     summary: str = Field(description="Сводка новости")

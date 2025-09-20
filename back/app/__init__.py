@@ -9,9 +9,6 @@ from app.config import Config
 db = SQLAlchemy()
 migrate = Migrate()
 
-news_service = None
-user_service = None
-
 
 def create_app(config_class: Optional[Type[Config]] = None) -> Flask:
     """Application factory used by both tests and production."""
@@ -31,6 +28,19 @@ def create_app(config_class: Optional[Type[Config]] = None) -> Flask:
     from app.routes import main_bp
 
     app.register_blueprint(main_bp)
+
+    from flask_cors import CORS
+
+    CORS(
+        app,
+        resources={r"/api/.*": {
+            "origins": ["http://localhost:8080", "http://127.0.0.1:8080"],
+            "allow_headers": ["Authorization", "Content-Type"],
+            "methods": ["GET", "POST", "OPTIONS"],
+            "supports_credentials": True,
+        }}
+    )
+
 
     with app.app_context():
         db.create_all()
