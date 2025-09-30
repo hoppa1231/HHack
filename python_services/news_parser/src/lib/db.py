@@ -1,7 +1,7 @@
 import logging
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from models import Base, News
+from lib.models import Base, News
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(

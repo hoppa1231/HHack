@@ -2,7 +2,7 @@ from yoyo import read_migrations, get_backend
 import logging
 import os
 
-DATABASE_URL = os.environ.get("POSTGRES_MINZ_URL")
+DATABASE_URL = os.environ.get("POSTGRES_NEWS_URL")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 MIGRATIONS_PATH = os.path.join(BASE_DIR, "migrations")

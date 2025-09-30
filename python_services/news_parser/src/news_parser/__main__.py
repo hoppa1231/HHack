@@ -10,7 +10,7 @@ logging.basicConfig(
 )
 
 REQUIRED_ENV_VARS = [
-    "POSTGRES_URL",
+    "POSTGRES_NEWS_URL",
     "GIGA_AUTH_KEY",
     "GIGA_SCOPE"
 ]
@@ -20,7 +20,7 @@ if missing_vars:
         raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
 def main():
-    POSTGRES_URL = os.getenv("POSTGRES_URL")
+    POSTGRES_URL = os.getenv("POSTGRES_NEWS_URL")
 
     db = Database(POSTGRES_URL)
     fetcher = NewsFetcher()
