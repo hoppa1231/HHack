@@ -5,7 +5,7 @@ import os
 DATABASE_URL = os.environ.get("POSTGRES_NEWS_URL")
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MIGRATIONS_PATH = os.path.join(BASE_DIR, "migrations")
+MIGRATIONS_PATH = os.path.join(BASE_DIR, "database_migrations")
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
