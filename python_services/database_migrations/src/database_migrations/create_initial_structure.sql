@@ -9,11 +9,11 @@ create type news_category as enum (
     'наука',
     'здоровье',
     'развлечения',
-    'другое',
+    'другое'
     );
 
 
-CREATE TABLE IF NOT EXISTS news (
+CREATE TABLE news (
     id SERIAL PRIMARY KEY,
     title TEXT NOT NULL,
     link TEXT UNIQUE NOT NULL,
