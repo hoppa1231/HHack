@@ -14,6 +14,7 @@ class NewsCategory(enum.Enum):
     наука = "наука"
     здоровье = "здоровье"
     развлечения = "развлечения"
+    другое = "другое"
 
 class News(Base):
     __tablename__ = "news"

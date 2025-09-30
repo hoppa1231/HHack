@@ -9,6 +9,7 @@ create type news_category as enum (
     'наука',
     'здоровье',
     'развлечения',
+    'другое',
     );
 
 
