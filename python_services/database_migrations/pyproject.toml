@@ -1,0 +1,16 @@
+[project]
+name = "news-database"
+version = "0.1.0"
+description = "Service for migrations."
+authors = [{ name = "Ildar Malikov", email = "ildar72malikov@gmail.com" }]
+readme = "README.md"
+keywords = ["news", "database", "healthcare", "recommendations"]
+
+requires-python = ">=3.13,<4.0"
+dependencies = [
+    "yoyo-migrations (>=9.0.0,<10.0.0)",
+]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
