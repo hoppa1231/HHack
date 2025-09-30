@@ -1,0 +1,56 @@
+services:
+  postgres:
+    image: ankane/pgvector:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_ADMIN_DB}
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin" ]
+      interval: 10s
+      retries: 5
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init_db:/docker-entrypoint-initdb.d
+
+  database_migrations:
+    build:
+      context: .
+      dockerfile: ./python_services/database_migrations/Dockerfile
+    container_name: database_migrations
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: "no"
+    networks:
+      - default
+
+
+  news_parser:
+    build:
+      context: .
+      dockerfile: ./python_services/news_parser/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      database_migrations:
+        condition: service_completed_successfully
+    networks:
+      - default
+  
+networks:
+  default:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mysql_data:
+  redis_data:
