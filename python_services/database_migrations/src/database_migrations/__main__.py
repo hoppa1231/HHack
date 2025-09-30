@@ -1,4 +1,4 @@
-from db.migrations import apply_migrations
+from python_services.database_migrations.src.db.migrations import apply_migrations
 import logging
 import os
 
