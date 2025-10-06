@@ -19,8 +19,8 @@ RUN pip install poetry==2.1.0
 
 WORKDIR /app
 
-COPY pyproject.toml ./services/news_parser/pyproject.toml
-COPY poetry.lock ./services/news_parser/poetry.lock
+COPY python_services/news_parser/pyproject.toml ./services/news_parser/pyproject.toml
+COPY python_services/news_parser/poetry.lock ./services/news_parser/poetry.lock
 
 WORKDIR /app/services/news_parser
 
@@ -34,6 +34,6 @@ USER appuser
 
 EXPOSE 50050
 
-COPY src/ src
+COPY python_services/news_parser/src/ src
 
 CMD ["python", "-m", "news_parser.__main__"]

@@ -19,8 +19,8 @@ RUN pip install poetry==2.1.0
 
 WORKDIR /app
 
-COPY pyproject.toml ./services/database_migrations/pyproject.toml
-COPY poetry.lock ./services/database_migrations/poetry.lock
+COPY python_services/database_migrations/pyproject.toml ./services/database_migrations/pyproject.toml
+COPY python_services/database_migrations/poetry.lock ./services/database_migrations/poetry.lock
 
 WORKDIR /app/services/database_migrations
 
@@ -34,6 +34,6 @@ USER appuser
 
 EXPOSE 50051
 
-COPY src/ src
+COPY python_services/database_migrations/src/ src
 
 CMD ["python", "-m", "database_migrations.__main__"]
