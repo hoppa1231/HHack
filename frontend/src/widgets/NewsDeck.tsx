@@ -1,49 +1,45 @@
-import { useMemo, useState } from "react";
+﻿import { useMemo, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import FlipCard from "../features/news/FlipCard";
 import NewsCard from "../features/news/NewsCard";
 import type { News } from "../entities/news/model";
 import Button from "../shared/ui/Button";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, ExternalLink } from "lucide-react";
+import { NEWS_IMAGE_PLACEHOLDER } from "../entities/news/model";
 
 const sample: News[] = [
   {
-    id: "1",
-    title: "Слили фотографии Александра Фалеева",
-    summary: `Интернет взорвался: в сеть «утекли» редкие кадры Александра Фалеева, легендарного автора книг о силовых тренировках и, по совместительству, главного философа качалки.
-По неподтверждённым данным, снимки были сделаны в естественной среде обитания Фалеева — возле турника и чашки кофе. На фото он выглядит сурово, но загадочно, как человек, который только что отказался от жима лёжа ради долгих рассуждений о смысле жизни.
-Очевидцы утверждают, что на некоторых кадрах Александр якобы держит в руках гантелю весом 1 кг — «для разминки мозга». А на другом фото он задумчиво смотрит на пустой зал, где эхо повторяет его знаменитую фразу: «Не надо страдать — тренируйтесь в кайф».
-Эксперты уже сравнили эту утечку с «фитнес-версией» сливов архивов NASA: ценность информации велика, но понять её смогут только те, кто хотя бы раз пробовал приседать по Фалееву.
-В комментариях к фото поклонники пишут:
-— «Он не потеет, это железо плачет!»
-— «Судя по лицу, он сейчас откроет новый философский трактат о тяге в наклоне».
-
-По слухам, скоро появятся новые кадры, где Фалеев идёт в магазин за гречкой и внезапно начинает объяснять кассиру принцип суперкомпенсации.`,
-    image:
-      "https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNjhjZjE2YTQ5OTY0ODE5MTljZWEyMGYzYzk1MmVjZDM6ZmlsZV8wMDAwMDAwMDFjMGM2MjJmYmMyYjk3ZjM4NWNiYmJiOCIsInRzIjoiNDg4NDQ1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiI2MmIwZDU2MzM0ZTg0NTQ0NGFmODQwZDRjN2I3YTQ5Y2MxYjI2MWJmMzMyYWZhNmEyOWU1MDdkNTBlMzY5YjMxIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==",
-    category: "Politics",
+    id: 1,
+    title: "Пример новости о политике",
+    summary:
+      "Короткий текст о том, как команда объединила данные из разных источников и воспользовалась новой аналитической платформой.",
+    image: NEWS_IMAGE_PLACEHOLDER,
+    category: "Политика",
     source: "Grand News",
     publishedAt: new Date().toISOString(),
+    link: "https://example.com/news/1",
   },
   {
-    id: "2",
-    title: "",
-    summary: "The left-arm quick…",
-    image:
-      "https://chatgpt.com/backend-api/estuary/public_content/enc/eyJpZCI6Im1fNjhjZjE3YzY3Y2Q4ODE5MWJmYTgwNGM2MWMxMDY0YzQ6ZmlsZV8wMDAwMDAwMDA5ODQ2MjJmOWQwMjk0ZjQwM2VlNjE4MCIsInRzIjoiNDg4NDQ1IiwicCI6InB5aSIsImNpZCI6IjEiLCJzaWciOiIxODc4MDVmMDRiNTY1NTNlYjFhODY5OGNmNDc5NmZiZDE4MGJhYjMyNGUwNzEwMGE0NDBlNGUyMzVlM2UxNDMyIiwidiI6IjAiLCJnaXptb19pZCI6bnVsbCwiY3AiOm51bGwsIm1hIjpudWxsfQ==",
-    category: "Sports",
+    id: 2,
+    title: "Стартап запускает революционный продукт",
+    summary:
+      "Компания представила решение на основе ИИ, которое помогает редакциям ускорить подготовку материалов и анализ аудитории.",
+    image: NEWS_IMAGE_PLACEHOLDER,
+    category: "Технологии",
     source: "The Herald",
     publishedAt: new Date(Date.now() - 3600_000).toISOString(),
+    link: "https://example.com/news/2",
   },
   {
-    id: "3",
-    title: "How San Francisco’s Wealthiest Families launched Kamala Harris",
-    summary: "A network of donors…",
-    image:
-      "https://images.unsplash.com/photo-1509098681029-b45e9c845022?q=80&w=1600&auto=format&fit=crop",
-    category: "Politics",
+    id: 3,
+    title: "Крупный спортивный турнир завершился сенсацией",
+    summary:
+      "Финал соревнований завершился неожиданным результатом, а болельщики обсуждают новую стратегию команды-победителя.",
+    image: NEWS_IMAGE_PLACEHOLDER,
+    category: "Спорт",
     source: "SF Chronicle",
     publishedAt: new Date(Date.now() - 7200_000).toISOString(),
+    link: "https://example.com/news/3",
   },
 ];
 
@@ -69,13 +65,27 @@ export default function NewsDeck({ news = sample }: { news?: News[] }) {
               front={<NewsCard item={item} />}
               back={
                 <div className="h-full w-full rounded-3xl bg-white dark:bg-slate-900 overflow-y-auto">
-                  <div className="p-5">
-                    <h3 className="text-lg font-bold leading-snug">
-                      {item.title}
-                    </h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-3 leading-relaxed">
-                      {item.summary}
-                    </p>
+                  <div className="p-5 space-y-4">
+                    <div>
+                      <h3 className="text-lg font-bold leading-snug">
+                        {item.title}
+                      </h3>
+                      <p className="text-sm text-slate-600 dark:text-slate-300 mt-3 leading-relaxed">
+                        {item.summary}
+                      </p>
+                    </div>
+                    {item.link && (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(event) => event.stopPropagation()}
+                        className="inline-flex items-center gap-2 text-sm font-semibold text-sky-600 hover:text-sky-500"
+                      >
+                        Перейти к источнику
+                        <ExternalLink size={16} />
+                      </a>
+                    )}
                   </div>
                 </div>
               }
@@ -85,10 +95,10 @@ export default function NewsDeck({ news = sample }: { news?: News[] }) {
 
         {cursor >= (news ?? []).length && (
           <div className="absolute inset-0 rounded-3xl bg-white/5 backdrop-blur-sm flex flex-col items-center justify-center gap-4">
-            <p className="text-white/80">На этом все</p>
+            <p className="text-white/80">Лента закончилась</p>
             <Button onClick={reset} className="flex items-center gap-2">
               <RotateCcw size={16} />
-              Пересмотреть
+              Начать заново
             </Button>
           </div>
         )}
