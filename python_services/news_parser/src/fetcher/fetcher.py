@@ -6,7 +6,7 @@ from lib.models import News, NewsCategory
 from lib.sources import RSS_FEEDS
 from categorizer_agent.categorizer import categorize_news
 from ranker_agent.score_ranker import score_news
-from searcher_agent.searcher import graph
+# from searcher_agent.searcher import graph
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -42,8 +42,9 @@ class NewsFetcher:
                     
                     logger.info("Starting categorization...")
                     news_category = categorize_news(news_title + " " + news_content[:512], news_link)
-                    logger.info("Starting resume generating...")
-                    news_resume = graph.invoke({"research_topic": news_title, 'news_content': news_content})
+                    # logger.info("Starting resume generating...")
+                    # news_resume = graph.invoke({"news_title": news_title, 'news_content': news_content})
+                    # logger.info(f"Generated resume: {news_resume}")
                     logger.info("Starting news scoring...")
                     news_score = score_news(news_title + " " + news_content, news_link)
 
@@ -55,10 +56,9 @@ class NewsFetcher:
                         content=news_content,
                         category=NewsCategory(news_category) if news_category in NewsCategory.__members__ else NewsCategory.другое,
                         created_at=datetime.datetime.utcnow(),
-                        news_resume=news_resume.get('running_summary', ''),
                         news_score = news_score
-
                     )
+
                     news_list.append(news)
                 logger.info("Fetched %d articles from %s", len(feed.entries), source)
             except Exception as e:
