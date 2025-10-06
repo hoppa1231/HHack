@@ -1,4 +1,4 @@
-from typing import Optional, Type
+﻿from typing import Optional, Type
 
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
@@ -31,18 +31,26 @@ def create_app(config_class: Optional[Type[Config]] = None) -> Flask:
 
     from flask_cors import CORS
 
+    allowed_origins = {
+        "http://localhost:8080",
+        "http://127.0.0.1:8080",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "*"
+    }
+
     CORS(
         app,
         resources={r"/api/.*": {
-            "origins": ["http://localhost:8080", "http://127.0.0.1:8080"],
+            "origins": list(allowed_origins),
             "allow_headers": ["Authorization", "Content-Type"],
             "methods": ["GET", "POST", "OPTIONS"],
             "supports_credentials": True,
         }}
     )
 
-
     with app.app_context():
         db.create_all()
 
     return app
+

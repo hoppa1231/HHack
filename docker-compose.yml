@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   postgres:
     image: ankane/pgvector:latest
@@ -17,9 +19,7 @@ services:
       - ./init_db:/docker-entrypoint-initdb.d
 
   database_migrations:
-    build:
-      context: .
-      dockerfile: ./python_services/database_migrations/Dockerfile
+    build: ./python_services/database_migrations
     container_name: database_migrations
     env_file:
       - .env
@@ -30,11 +30,23 @@ services:
     networks:
       - default
 
+  backend:
+    build: ./back
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      database_migrations:
+        condition: service_completed_successfully
+    ports:
+      - "5000:5000"
+    networks:
+      - default
 
   news_parser:
-    build:
-      context: .
-      dockerfile: ./python_services/news_parser/Dockerfile
+    build: ./python_services/news_parser
     restart: unless-stopped
     env_file:
       - .env
@@ -45,7 +57,18 @@ services:
         condition: service_completed_successfully
     networks:
       - default
-  
+
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    ports:
+      - "8080:8080"
+    networks:
+      - default
+
 networks:
   default:
     driver: bridge

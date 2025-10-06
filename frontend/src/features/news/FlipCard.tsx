@@ -18,7 +18,7 @@ export default function FlipCard({
   const opacity = useTransform(x, [-220, 0, 220], [0, 1, 0]);
 
   const handleDragEnd = (_: any, info: { offset: { x: number } }) => {
-    const threshold = 130;
+    const threshold = 20;
     if (info.offset.x > threshold) onSwipe?.("right");
     else if (info.offset.x < -threshold) onSwipe?.("left");
   };

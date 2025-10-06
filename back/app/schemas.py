@@ -1,42 +1,70 @@
-from pydantic import BaseModel, Field
-from typing import List
+﻿from datetime import datetime, timedelta, timezone
 from enum import Enum
+from typing import List, Optional, Literal
+
+from pydantic import BaseModel, Field
+
+CategoryType = Literal[
+    'политика', 'экономика', 'спорт', 'технологии', 
+    'культура', 'наука', 'здоровье', 'развлечения', 'другое'
+]
 
 class Register(BaseModel):
-    name: str = Field(description="имя пользователя")
-    password: str = Field(description="пароль пользователя")
-    preferences: List[str] = Field(description="Список тегов предпочтений")
+    name: str = Field(description="Имя пользователя")
+    password: str = Field(description="Пароль пользователя")
+    preferences: List[CategoryType] = Field(
+        default_factory=list,
+        description="Список интересующих категорий"
+    )
 
 class Login(BaseModel):
-    name: str = Field(description="имя пользователя")
+    name: str = Field(description="Имя пользователя")
+    password: str = Field(description="Пароль пользователя")
 
-class TokenPayload(BaseModel):
-    user_id: int = Field(description="id пользователя")
 
 class TokenResponse(BaseModel):
-    access_token: str = Field(description="JWT-токен для авторизации")
+    access_token: str = Field(description="JWT-токен для доступа")
 
-class NewsPeriod(Enum):
-    DAY = "day"
-    WEEK = "week"
-    MONTH = "month"
 
-class NewsRequest(BaseModel):
-    user_id: int = Field(description='id пользователя')
-    news_period: NewsPeriod = Field(description="Период за который нужно получить сводку новостей")
+class NewsPeriod(str, Enum):
+    day = "day"
+    week = "week"
+    month = "month"
 
-class News(BaseModel):
-    news_id: int = Field(description="id новости")
-    img_url: str = Field(description="Ссылка на картинку новости")
-    header: str = Field(description="Заголовок новости")
-    mini_description: str = Field(description="Краткое описание новости")
 
-class NewsResponse(BaseModel):
-    news: List[News] = Field(description="Список новостей")
+class NewsQueryParams(BaseModel):
+    category: Optional[str] = Field(default=None, description="Категория новости")
+    period: Optional[NewsPeriod] = Field(default=None, description="Период выборки")
+    limit: int = Field(default=50, ge=1, le=200, description="Максимальное количество новостей")
 
-class SummaryRequest(BaseModel):
-    news_id: int = Field(description="id новости")
+    def cutoff(self) -> Optional[datetime]:
+        if not self.period:
+            return None
+        now = datetime.now(timezone.utc)
+        mapping = {
+            NewsPeriod.day: timedelta(days=1),
+            NewsPeriod.week: timedelta(days=7),
+            NewsPeriod.month: timedelta(days=30),
+        }
+        return now - mapping[self.period]
 
-class SummaryResponse(BaseModel):
-    header: str = Field(description="Заголовок новости")
-    summary: str = Field(description="Сводка новости")
+
+class NewsItem(BaseModel):
+    id: int
+    title: str
+    summary: str
+    category: str
+    source: str
+    published_at: Optional[datetime] = None
+    image: Optional[str] = None
+    link: Optional[str] = None
+
+
+class NewsListResponse(BaseModel):
+    items: List[NewsItem]
+
+
+class NewsDetail(NewsItem):
+    content: Optional[str] = None
+
+
