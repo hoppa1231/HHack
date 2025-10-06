@@ -1,16 +1,11 @@
-import { useQuery } from "@tanstack/react-query";
-import { http } from "../../shared/api/http";
+﻿import { useQuery } from "@tanstack/react-query";
+import { fetchNews, type NewsQuery } from "../../api/news";
 import type { News } from "../../entities/news/model";
 
-export function useNewsQuery(params?: {
-  category?: string;
-  period?: "day" | "week" | "month";
-}) {
+export function useNewsQuery(params?: NewsQuery) {
   return useQuery<News[]>({
-    queryKey: ["news", params?.category, params?.period],
-    queryFn: async () => {
-      const { data } = await http.get<News[]>("/news", { params });
-      return data;
-    },
+    queryKey: ["news", params],
+    queryFn: () => fetchNews(params),
   });
 }
+

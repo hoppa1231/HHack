@@ -1,36 +1,58 @@
+﻿from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from sqlalchemy.sql import func
+
 from app import db
-from enum import Enum
 
-class Preference(Enum):
-    SPORT = 'sport',
-    MUSIC = 'music',
-    MOVIE = 'movie',
-    POLITICS = 'politics'
-    SCIENCE = 'science'
+NEWS_CATEGORIES = (
+    "политика",
+    "экономика",
+    "спорт",
+    "технологии",
+    "IT",
+    "культура",
+    "наука",
+    "здоровье",
+    "развлечения",
+    "другое",
+)
 
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
-    password = db.Column(db.String(100))
-    preferences = db.Column(db.String(100), default='') # Пока не знаю как это хранить, поэтому пока пусть будет строкой
+news_category_enum = PGEnum(*NEWS_CATEGORIES, name="news_category", create_type=False)
 
 
 class News(db.Model):
+    __tablename__ = "news"
+
     id = db.Column(db.Integer, primary_key=True)
-    header = db.Column(db.String(100))
-    tags = db.Column(db.String(100)) # пока назовем теги, но в общем понимании, это - принадлежность новости к теме
-    image_url = db.Column(db.String(100), default='')
+    title = db.Column(db.Text, nullable=False)
+    link = db.Column(db.Text, unique=True, nullable=False)
+    source = db.Column(db.String(100), nullable=False)
+    published = db.Column(db.DateTime(timezone=True), server_default=func.now())
+    content = db.Column(db.Text)
+    category = db.Column(news_category_enum, nullable=False)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
-    sources = db.relationship('NewsSource', backref='news', lazy=True, cascade='all, delete-orphan')
-    
+    __table_args__ = (
+        db.Index("ix_news_published", published.desc()),
+        db.Index("ix_news_category", category),
+    )
 
-class NewsSources(db.Model):
+    def summary(self, length: int = 320) -> str:
+        if not self.content:
+            return ""
+        text = self.content.strip()
+        if len(text) <= length:
+            return text
+        truncated = text[:length].rsplit(" ", 1)[0]
+        return truncated + "..."
+
+
+class User(db.Model):
+    __tablename__ = "users"
+
     id = db.Column(db.Integer, primary_key=True)
-    news_id = db.Column(db.Integer, db.ForeignKey('news.id'), nullable=False)
-    source_name = db.Column(db.String(50), nullable=False)
-    url = db.Column(db.String(200), nullable=False)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    preferences = db.Column(db.JSON, nullable=False, default=list)
+    created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
-    # Метаданные об источнике
-    reading_time = db.Column(db.Integer, default=0) # Чтение в минутах
-    views_count = db.Column(db.Integer, default=0)
-    
+
