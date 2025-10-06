@@ -1,9 +1,10 @@
-﻿export type News = {
+export type News = {
   id: number;
   title: string;
   summary: string;
   category: string;
   source: string;
+  newsScore?: number | null;
   publishedAt?: string;
   image?: string | null;
   link?: string | null;
