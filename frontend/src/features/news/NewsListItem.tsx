@@ -1,17 +1,23 @@
-﻿import type { KeyboardEvent } from "react";
+import type { KeyboardEvent } from "react";
+import { ExternalLink } from "lucide-react";
 import type { News } from "../../entities/news/model";
 import { NEWS_IMAGE_PLACEHOLDER } from "../../entities/news/model";
 import { formatDate } from "../../entities/news/lib";
-import { ExternalLink } from "lucide-react";
 
 export default function NewsListItem({
   item,
+  index,
+  selected,
   onSelect,
 }: {
   item: News;
+  index: number;
+  selected?: boolean;
   onSelect?: () => void;
 }) {
   const imageSrc = item.image ?? NEWS_IMAGE_PLACEHOLDER;
+  const imageFirst = index % 2 === 0;
+
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -25,36 +31,45 @@ export default function NewsListItem({
       tabIndex={0}
       onClick={onSelect}
       onKeyDown={handleKeyDown}
-      className="w-full bg-white/5 rounded-2xl p-3 flex gap-3 items-start backdrop-blur-sm text-left hover:bg-white/8 transition focus:outline-none focus:ring-2 focus:ring-white/40"
+      className={`group flex flex-col md:flex-row ${imageFirst ? "md:flex-row" : "md:flex-row-reverse"} gap-6 items-stretch rounded-3xl border border-white/10 bg-white/5 hover:bg-white/7 transition backdrop-blur px-4 py-4 md:px-6 md:py-5 focus:outline-none focus:ring-2 focus:ring-white/50 ${selected ? "ring-2 ring-sky-300" : ""}`}
     >
-      <img
-        src={imageSrc}
-        alt="thumb"
-        className="w-16 h-16 object-cover rounded-xl flex-shrink-0"
-      />
-      <div className="flex-1 min-w-0 space-y-1">
-        <div className="text-[10px] uppercase tracking-wider text-white/70">
-          {item.category}
+      <div className="md:w-60 w-full overflow-hidden rounded-2xl shadow-lg">
+        <img
+          src={imageSrc}
+          alt={item.title}
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+        />
+      </div>
+      <div className="flex-1 flex flex-col justify-between min-w-0 space-y-3">
+        <div className="space-y-2">
+          <div className="text-xs uppercase tracking-[0.2em] text-white/60">
+            {item.category}
+          </div>
+          <h3 className="text-xl font-semibold leading-tight text-white line-clamp-2">
+            {item.title}
+          </h3>
+          <p className="text-sm leading-relaxed text-white/70 line-clamp-3">
+            {item.summary}
+          </p>
         </div>
-        <div className="text-sm font-semibold leading-snug line-clamp-2 text-white">
-          {item.title}
+        <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-white/60">
+          <span>
+            {item.source}
+            {item.publishedAt ? ` • ${formatDate(item.publishedAt)}` : ""}
+          </span>
+          {item.link && (
+            <a
+              href={item.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(event) => event.stopPropagation()}
+              className="inline-flex items-center gap-2 text-sm font-semibold text-sky-300 hover:text-sky-200"
+            >
+              Read in source
+              <ExternalLink size={16} />
+            </a>
+          )}
         </div>
-        <div className="text-[11px] text-white/60">
-          {item.source}
-          {item.publishedAt ? ` • ${formatDate(item.publishedAt)}` : ""}
-        </div>
-        {item.link && (
-          <a
-            href={item.link}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(event) => event.stopPropagation()}
-            className="inline-flex items-center gap-1 text-[11px] text-sky-300 hover:text-sky-200"
-          >
-            Читать в источнике
-            <ExternalLink size={12} />
-          </a>
-        )}
       </div>
     </div>
   );
