@@ -33,11 +33,11 @@ export default function NewsListItem({
       onKeyDown={handleKeyDown}
       className={`group flex flex-col md:flex-row ${imageFirst ? "md:flex-row" : "md:flex-row-reverse"} gap-6 items-stretch rounded-3xl border border-white/10 bg-white/5 hover:bg-white/7 transition backdrop-blur px-4 py-4 md:px-6 md:py-5 focus:outline-none focus:ring-2 focus:ring-white/50 ${selected ? "ring-2 ring-sky-300" : ""}`}
     >
-      <div className="md:w-60 w-full overflow-hidden rounded-2xl shadow-lg">
+      <div className="md:w-60 w-full max-h-[250px] overflow-hidden rounded-2xl shadow-lg">
         <img
           src={imageSrc}
           alt={item.title}
-          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          className="w-full h-auto max-h-[250px] object-cover transition duration-300 group-hover:scale-105"
         />
       </div>
       <div className="flex-1 flex flex-col justify-between min-w-0 space-y-3">
@@ -65,7 +65,7 @@ export default function NewsListItem({
               onClick={(event) => event.stopPropagation()}
               className="inline-flex items-center gap-2 text-sm font-semibold text-sky-300 hover:text-sky-200"
             >
-              Read in source
+              Источник
               <ExternalLink size={16} />
             </a>
           )}

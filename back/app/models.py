@@ -1,4 +1,4 @@
-﻿from sqlalchemy.dialects.postgresql import ENUM as PGEnum
+from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from sqlalchemy.sql import func
 
 from app import db
@@ -29,11 +29,13 @@ class News(db.Model):
     published = db.Column(db.DateTime(timezone=True), server_default=func.now())
     content = db.Column(db.Text)
     category = db.Column(news_category_enum, nullable=False)
+    # news_score = db.Column(db.Float, nullable=True, default=0.0)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
     __table_args__ = (
         db.Index("ix_news_published", published.desc()),
         db.Index("ix_news_category", category),
+    #    db.Index("ix_news_score", news_score.desc()),
     )
 
     def summary(self, length: int = 320) -> str:
@@ -54,5 +56,3 @@ class User(db.Model):
     password = db.Column(db.String(255), nullable=False)
     preferences = db.Column(db.JSON, nullable=False, default=list)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
-
-
