@@ -1,4 +1,4 @@
-﻿import { useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "../api/news";
 import type { Period, NewsDetail, News } from "../entities/news/model";
@@ -29,8 +29,8 @@ export default function News() {
   });
 
   return (
-    <div style={{ maxWidth: 680, margin: "0 auto", padding: 24 }}>
-      <h2>Новости</h2>
+    <div style={{ maxWidth: 780, margin: "0 auto", padding: 24 }}>
+      <h2>Новости (демо-страница)</h2>
       <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
         <select value={period} onChange={(e) => setPeriod(e.target.value as Period)}>
           <option value="day">За день</option>
@@ -68,7 +68,7 @@ export default function News() {
       </div>
 
       {detail && (
-        <div style={{ marginTop: 16, padding: 12, border: "1px солид #999", borderRadius: 8, background: "#fafafa" }}>
+        <div style={{ marginTop: 16, padding: 12, border: "1px solid #999", borderRadius: 8, background: "#fafafa" }}>
           <h4>{detail.title}</h4>
           <p>{detail.content ?? detail.summary}</p>
           {detail.link && (
