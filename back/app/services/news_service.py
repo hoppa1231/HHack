@@ -1,28 +1,43 @@
-﻿from typing import List, Optional
+from typing import List, Optional
 
 from sqlalchemy import nullslast
 
 from app.models import News
 from app.schemas import NewsDetail, NewsItem, NewsQueryParams
 
+
+def _seed_urls(prefix: str, count: int = 20) -> List[str]:
+    return [f"https://picsum.photos/seed/{prefix}-{i}/1200/800" for i in range(1, count + 1)]
+
+
 CATEGORY_PLACEHOLDERS = {
-    "политика": "https://images.unsplash.com/photo-1521543836029-819f06c44736?auto=format&fit=crop&w=1200&q=80",
-    "экономика": "https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80",
-    "спорт": "https://images.unsplash.com/photo-1508609349937-5ec4ae374ebf?auto=format&fit=crop&w=1200&q=80",
-    "технологии": "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1200&q=80",
-    "IT": "https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?auto=format&fit=crop&w=1200&q=80",
-    "культура": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1200&q=80",
-    "наука": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=1200&q=80",
-    "здоровье": "https://images.unsplash.com/photo-1514996937319-344454492b37?auto=format&fit=crop&w=1200&q=80",
-    "развлечения": "https://images.unsplash.com/photo-1525182008055-f88b95ff7980?auto=format&fit=crop&w=1200&q=80",
-    "другое": "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=1200&q=80",
+    "политика": _seed_urls("politics"),
+    "экономика": _seed_urls("economy"),
+    "спорт": _seed_urls("sports"),
+    "технологии": _seed_urls("technology"),
+    "IT": _seed_urls("it"),
+    "культура": _seed_urls("culture"),
+    "наука": _seed_urls("science"),
+    "здоровье": _seed_urls("health"),
+    "развлечения": _seed_urls("entertainment"),
+    "другое": _seed_urls("general"),
 }
-DEFAULT_IMAGE = CATEGORY_PLACEHOLDERS["другое"]
+
+GENERIC_PLACEHOLDERS = _seed_urls("generic")
+
+
+def _pick_placeholder(pool: List[str], index: int) -> str:
+    if not pool:
+        return GENERIC_PLACEHOLDERS[index % len(GENERIC_PLACEHOLDERS)]
+    return pool[index % len(pool)]
 
 
 class NewsService:
     def get_news(self, params: NewsQueryParams) -> List[NewsItem]:
-        query = News.query.order_by(nullslast(News.published.desc()), News.id.desc())
+        query = News.query.order_by(
+            nullslast(News.published.desc()),
+            News.id.desc(),
+        )
 
         if params.category:
             query = query.filter(News.category == params.category)
@@ -40,10 +55,10 @@ class NewsService:
                 category=row.category,
                 source=row.source,
                 published_at=row.published or row.created_at,
-                image=self._image_for(row.category),
+                image=self._image_for(row.category, idx),
                 link=row.link,
             )
-            for row in rows
+            for idx, row in enumerate(rows)
         ]
 
     def get_detail(self, news_id: int) -> NewsDetail:
@@ -59,13 +74,11 @@ class NewsService:
             category=row.category,
             source=row.source,
             published_at=row.published or row.created_at,
-            image=self._image_for(row.category),
+            image=self._image_for(row.category, 0),
             link=row.link,
         )
 
-    def _image_for(self, category: Optional[str]) -> str:
-        if not category:
-            return DEFAULT_IMAGE
-        return CATEGORY_PLACEHOLDERS.get(category, DEFAULT_IMAGE)
-
-
+    def _image_for(self, category: Optional[str], index: int) -> str:
+        if category and category in CATEGORY_PLACEHOLDERS:
+            return _pick_placeholder(CATEGORY_PLACEHOLDERS[category], index)
+        return _pick_placeholder(GENERIC_PLACEHOLDERS, index)
