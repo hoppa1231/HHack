@@ -1,15 +1,21 @@
 ﻿from datetime import datetime, timedelta, timezone
 from enum import Enum
-from typing import List, Optional
+from typing import List, Optional, Literal
 
 from pydantic import BaseModel, Field
 
+CategoryType = Literal[
+    'политика', 'экономика', 'спорт', 'технологии', 
+    'культура', 'наука', 'здоровье', 'развлечения', 'другое'
+]
 
 class Register(BaseModel):
     name: str = Field(description="Имя пользователя")
     password: str = Field(description="Пароль пользователя")
-    preferences: List[str] = Field(default_factory=list, description="Список интересующих категорий")
-
+    preferences: List[CategoryType] = Field(
+        default_factory=list,
+        description="Список интересующих категорий"
+    )
 
 class Login(BaseModel):
     name: str = Field(description="Имя пользователя")
