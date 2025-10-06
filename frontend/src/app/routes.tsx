@@ -9,7 +9,7 @@ export default function AppRoutes() {
     <BrowserRouter>
       <QueryProvider>
         <Routes>
-          <Route path="/" element={<Navigate to="/auth" />} />
+          <Route path="/" element={<Navigate to="/news" />} />
           <Route path="/news" element={<NewsPage />} />
           <Route path="/auth" element={<Login />} />
         </Routes>
