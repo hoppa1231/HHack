@@ -60,6 +60,21 @@ services:
     networks:
       - default
 
+  news_categorizer:
+    build:
+      context: .
+      dockerfile: ./python_services/news_categorizer/Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      database_migrations:
+        condition: service_completed_successfully
+    networks:
+      - default
+
   frontend:
     build: ./frontend
     restart: unless-stopped

@@ -8,7 +8,7 @@ from datetime import datetime
 from search.utils  import deduplicate_and_format_sources, format_sources, duckduckgo_search
 from searcher_agent.state import SummaryState, SummaryStateInput, SummaryStateOutput
 from lib.prompts import query_writer_instructions, summarizer_instructions
-from langchain_gigachat import GigaChat
+from langchain_deepseek import ChatDeepSeek
 
 GIGACHAT_API_KEY = os.environ.get("GIGA_AUTH_KEY")
 GIGA_SCOPE = os.environ.get("GIGA_SCOPE")
@@ -26,15 +26,11 @@ logging.basicConfig(
 )
 
 # Инициализация LLM
-llm = GigaChat(
-    credentials=GIGACHAT_API_KEY, 
-    scope=GIGA_SCOPE,
-    model="GigaChat-2", 
-    verify_ssl_certs=False,
-    temperature=0.1,
-    max_tokens=10,
-    timeout=TIMEOUT
-)
+llm = ChatDeepSeek(
+            model="deepseek-chat", 
+            temperature=1,
+            max_tokens=4096,
+        )
 
 # Nodes
 def generate_query(state: SummaryState):
@@ -95,7 +91,7 @@ def web_research(state: SummaryState):
 
     # Search the web
     try:
-        search_results = duckduckgo_search(state.search_query, state.search_query_en, max_results=5, fetch_full_page=True)
+        search_results = duckduckgo_search(state.search_query, max_results=6, fetch_full_page=True)
         search_str = deduplicate_and_format_sources(search_results, max_tokens_per_source=4096, fetch_full_page=True)
         logger.info(f"Successfully fetched web research results for query: {state.search_query}")
     except Exception as e:

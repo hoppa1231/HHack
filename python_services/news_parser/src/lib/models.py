@@ -27,4 +27,4 @@ class News(Base):
     content = Column(Text)
     category = Column(Enum(NewsCategory, name="news_category"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True))
-    news_score = Column(Integer)
+    # news_score = Column(Integer)
