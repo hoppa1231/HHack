@@ -27,3 +27,5 @@ class News(Base):
     content = Column(Text)
     category = Column(Enum(NewsCategory, name="news_category"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True))
+    news_resume = Column(Text)  # New field for the news summary
+    news_score = Column(Integer)
