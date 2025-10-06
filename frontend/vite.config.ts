@@ -1,10 +1,12 @@
-﻿import { defineConfig } from "vite";
+﻿declare const process: { env: Record<string, string | undefined> };
+
+import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 const allowedHostsEnv = process.env.VITE_ALLOWED_HOSTS ?? "";
 const allowedHosts = allowedHostsEnv
   .split(",")
-  .map((host) => host.trim())
+  .map((host: string) => host.trim())
   .filter(Boolean);
 
 export default defineConfig({

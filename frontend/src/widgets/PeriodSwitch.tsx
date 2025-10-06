@@ -1,4 +1,4 @@
-type Period = "day" | "week" | "month";
+﻿import type { Period } from "../entities/news/model";
 
 const labels: Record<Period, string> = {
   day: "День",
@@ -29,3 +29,4 @@ export default function PeriodSwitch({
     </div>
   );
 }
+
