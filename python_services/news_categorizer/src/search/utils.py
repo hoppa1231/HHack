@@ -110,7 +110,7 @@ def fetch_raw_content(url: str) -> Optional[str]:
         return None
 
 @traceable
-def duckduckgo_search(ru_query: str, en_query: str, max_results: int = 3, fetch_full_page: bool = False) -> Dict[str, List[Dict[str, Any]]]:
+def duckduckgo_search(ru_query: str, max_results: int = 3, fetch_full_page: bool = False) -> Dict[str, List[Dict[str, Any]]]:
     """
     Search the web using DuckDuckGo and return formatted results.
     
@@ -134,8 +134,7 @@ def duckduckgo_search(ru_query: str, en_query: str, max_results: int = 3, fetch_
         with DDGS() as ddgs:
             results = []
             search_results_ru = list(ddgs.text(ru_query, max_results=max_results))
-            search_results_en = list(ddgs.text(en_query, max_results=max_results))
-            search_results = search_results_ru + search_results_en
+            search_results = search_results_ru
             
             for r in search_results:
                 url = r.get('href')

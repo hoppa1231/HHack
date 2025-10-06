@@ -12,10 +12,10 @@ logging.basicConfig(
 
 REQUIRED_ENV_VARS = [
     "POSTGRES_NEWS_DB",
-    "DATABASE_USER",
-    "DATABASE_PASSWORD",
-    "DATABASE_HOST",
-    "DATABASE_PORT"
+    "POSTGRES_USER",
+    "POSTGRES_PASSWORD",
+    "POSTGRES_HOST",
+    "POSTGRES_PORT"
 ]
 
 missing_vars = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
@@ -24,10 +24,10 @@ if missing_vars:
 
 DSN = (
     f"dbname={os.environ['POSTGRES_NEWS_DB']} "
-    f"user={os.environ['DATABASE_USER']} "
-    f"password={os.environ['DATABASE_PASSWORD']} "
-    f"host={os.environ['DATABASE_HOST']} "
-    f"port={os.environ['DATABASE_PORT']}"
+    f"user={os.environ['POSTGRES_USER']} "
+    f"password={os.environ['POSTGRES_PASSWORD']} "
+    f"host={os.environ['POSTGRES_HOST']} "
+    f"port={os.environ['POSTGRES_PORT']}"
 )
 
 def get_unprocessed_news():
@@ -54,7 +54,9 @@ def main_loop():
                     logger.info(f"Updating summary for news ID={news_id}")
                     resume_response = graph.invoke({"news_title": title, "news_content": content})
                     resume = resume_response.get("running_resume", "")
+                    logger.info(f"Generated summary: {resume}")
                     update_news_resume(news_id, resume)
+                    logger.info(f"Resume succesfully updated.")
                     time.sleep(2)  # avoid API overload
 
         except Exception as e:

@@ -45,8 +45,8 @@ class NewsFetcher:
                     # logger.info("Starting resume generating...")
                     # news_resume = graph.invoke({"news_title": news_title, 'news_content': news_content})
                     # logger.info(f"Generated resume: {news_resume}")
-                    logger.info("Starting news scoring...")
-                    news_score = score_news(news_title + " " + news_content, news_link)
+                    # logger.info("Starting news scoring...")
+                    # news_score = score_news(news_title + " " + news_content, news_link)
 
                     news = News(
                         title=news_title,
@@ -56,7 +56,7 @@ class NewsFetcher:
                         content=news_content,
                         category=NewsCategory(news_category) if news_category in NewsCategory.__members__ else NewsCategory.другое,
                         created_at=datetime.datetime.utcnow(),
-                        news_score = news_score
+                        # news_score = news_score
                     )
 
                     news_list.append(news)
