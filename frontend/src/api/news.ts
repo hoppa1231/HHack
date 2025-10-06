@@ -7,6 +7,17 @@ export type NewsQuery = {
   limit?: number;
 };
 
+export type CategoryType = 
+  | 'политика' 
+  | 'экономика' 
+  | 'спорт' 
+  | 'технологии' 
+  | 'культура' 
+  | 'наука' 
+  | 'здоровье' 
+  | 'развлечения' 
+  | 'другое';
+
 export type RegisterPayload = {
   name: string;
   password: string;
@@ -16,6 +27,7 @@ export type RegisterPayload = {
 export type LoginPayload = {
   name: string;
   password: string;
+  preferences: CategoryType[];
 };
 
 export type TokenResponse = {
