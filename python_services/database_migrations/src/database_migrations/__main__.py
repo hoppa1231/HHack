@@ -10,7 +10,6 @@ logging.basicConfig(
 
 REQUIRED_ENV_VARS = [
     "POSTGRES_NEWS_URL",
-    "POSTGRES_ADMIN_URL",
 ]
 
 missing_vars = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
