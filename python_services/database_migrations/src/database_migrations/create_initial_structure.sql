@@ -10,7 +10,7 @@ create type news_category as enum (
     'здоровье',
     'развлечения',
     'другое'
-    );
+);
 
 
 CREATE TABLE news (
@@ -20,6 +20,8 @@ CREATE TABLE news (
     source VARCHAR(100) NOT NULL,
     published TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     content TEXT,
+    image_url TEXT,
+    description TEXT,
     category news_category NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     news_resume TEXT,

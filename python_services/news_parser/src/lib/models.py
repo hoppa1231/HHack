@@ -25,6 +25,9 @@ class News(Base):
     source = Column(String(100), nullable=False)
     published = Column(TIMESTAMP(timezone=True))
     content = Column(Text)
+    image_url = Column(Text)
+    description = Column(Text)
     category = Column(Enum(NewsCategory, name="news_category"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True))
     # news_score = Column(Integer)
+    

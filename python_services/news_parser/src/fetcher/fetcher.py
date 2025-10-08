@@ -6,6 +6,7 @@ from lib.models import News, NewsCategory
 from lib.sources import RSS_FEEDS
 from categorizer_agent.categorizer import categorize_news
 from ranker_agent.score_ranker import score_news
+from extract_image import extract_image_url_from_enclosures
 # from searcher_agent.searcher import graph
 
 logger = logging.getLogger(__name__)
@@ -38,6 +39,9 @@ class NewsFetcher:
 
                     news_title = getattr(entry, "title", "")
                     news_link = getattr(entry, "link", "")
+                    news_description = getattr(entry, "description", "")
+                    news_image = extract_image_url_from_enclosures(entry) or ""
+
                     news_content = self.clean_html(getattr(entry, "summary", ""))
                     
                     logger.info("Starting categorization...")
@@ -54,6 +58,8 @@ class NewsFetcher:
                         source=source,
                         published=published or datetime.datetime.utcnow(),
                         content=news_content,
+                        image_url=news_image,
+                        description=news_description,
                         category=NewsCategory(news_category) if news_category in NewsCategory.__members__ else NewsCategory.другое,
                         created_at=datetime.datetime.utcnow(),
                         # news_score = news_score
@@ -66,3 +72,4 @@ class NewsFetcher:
 
         logger.info("Total fetched: %d articles", len(news_list))
         return news_list
+    

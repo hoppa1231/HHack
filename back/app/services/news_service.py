@@ -55,7 +55,8 @@ class NewsService:
                 category=row.category,
                 source=row.source,
                 published_at=row.published or row.created_at,
-                image=self._image_for(row.category, idx),
+                image=row.image_url or self._image_for(row.category, idx),
+                description=row.description,
                 link=row.link,
             )
             for idx, row in enumerate(rows)
@@ -74,7 +75,8 @@ class NewsService:
             category=row.category,
             source=row.source,
             published_at=row.published or row.created_at,
-            image=self._image_for(row.category, 0),
+            image=row.image_url or self._image_for(row.category, 0),
+            description=row.description,
             link=row.link,
         )
 

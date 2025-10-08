@@ -57,6 +57,7 @@ class NewsItem(BaseModel):
     source: str
     published_at: Optional[datetime] = None
     image: Optional[str] = None
+    description: Optional[str] = None
     link: Optional[str] = None
 
 
