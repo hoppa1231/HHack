@@ -6,7 +6,7 @@ from lib.models import News, NewsCategory
 from lib.sources import RSS_FEEDS
 from categorizer_agent.categorizer import categorize_news
 from ranker_agent.score_ranker import score_news
-from extract_image import extract_image_url_from_enclosures
+from .extract_image import extract_image_url_from_enclosures
 # from searcher_agent.searcher import graph
 
 logger = logging.getLogger(__name__)
