@@ -36,6 +36,7 @@ export default function NewsListItem({
       <div className="md:w-60 w-full max-h-[250px] overflow-hidden rounded-2xl shadow-lg">
         <img
           src={imageSrc}
+          data-debug={imageSrc}
           alt={item.title}
           className="w-full h-auto max-h-[250px] object-cover transition duration-300 group-hover:scale-105"
         />

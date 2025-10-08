@@ -9,6 +9,7 @@ export default function NewsCard({ item }: { item: News }) {
     <div className="relative h-full w-full overflow-hidden rounded-3xl">
       <img
         src={imageSrc}
+        data-debug={imageSrc}
         alt={item.title}
         className="h-full w-full object-cover"
       />
