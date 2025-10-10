@@ -5,6 +5,7 @@ export type NewsQuery = {
   category?: string;
   period?: Period;
   limit?: number;
+  sources?: string[];
 };
 
 export type CategoryType = 
@@ -35,10 +36,31 @@ export type TokenResponse = {
 };
 
 export const fetchNews = (params?: NewsQuery) =>
-  http.get<News[]>("/news", { params }).then((r) => r.data);
+  http
+    .get<News[]>("/news", {
+      params: params
+        ? {
+            ...params,
+            sources:
+              params.sources && params.sources.length > 0
+                ? params.sources.join(",")
+                : undefined,
+          }
+        : undefined,
+    })
+    .then((r) => r.data);
 
 export const fetchNewsDetail = (id: number) =>
   http.get<NewsDetail>(`/news/${id}`).then((r) => r.data);
+
+export type SourceInfo = {
+  name: string;
+  chosen: boolean;
+  available: boolean;
+};
+
+export const fetchSources = () =>
+  http.get<SourceInfo[]>("/sources").then((r) => r.data);
 
 export const register = (payload: RegisterPayload) =>
   http.post<TokenResponse>("/register", payload).then((r) => r.data);
@@ -51,5 +73,6 @@ export const api = {
   login,
   fetchNews,
   fetchNewsDetail,
+  fetchSources,
 };
 
