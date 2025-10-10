@@ -1,166 +1,63 @@
-import httpx
-from typing import Dict, Any, List, Union, Optional
-
+import os
+from playwright.sync_api import sync_playwright
 from markdownify import markdownify
-from langsmith import traceable
-from duckduckgo_search import DDGS
+from yandex_search_api import YandexSearchAPIClient
+from yandex_search_api.client import SearchType
+FOLDER_ID = os.environ.get("YANDEX_FOLDER_ID")
+OAUTH_KEY = os.environ.get("YANDEX_OAUTH_KEY")
 
-def deduplicate_and_format_sources(
-    search_response: Union[Dict[str, Any], List[Dict[str, Any]]], 
-    max_tokens_per_source: int, 
-    fetch_full_page: bool = False
-) -> str:
-    """
-    Format and deduplicate search responses from various search APIs.
-    
-    Takes either a single search response or list of responses from search APIs,
-    deduplicates them by URL, and formats them into a structured string.
-    
-    Args:
-        search_response (Union[Dict[str, Any], List[Dict[str, Any]]]): Either:
-            - A dict with a 'results' key containing a list of search results
-            - A list of dicts, each containing search results
-        max_tokens_per_source (int): Maximum number of tokens to include for each source's content
-        fetch_full_page (bool, optional): Whether to include the full page content. Defaults to False.
-            
-    Returns:
-        str: Formatted string with deduplicated sources
-        
-    Raises:
-        ValueError: If input is neither a dict with 'results' key nor a list of search results
-    """
-    # Convert input to list of results
-    if isinstance(search_response, dict):
-        sources_list = search_response['results']
-    elif isinstance(search_response, list):
-        sources_list = []
-        for response in search_response:
-            if isinstance(response, dict) and 'results' in response:
-                sources_list.extend(response['results'])
-            else:
-                sources_list.extend(response)
-    else:
-        raise ValueError("Input must be either a dict with 'results' or a list of search results")
-    
-    # Deduplicate by URL
-    unique_sources = {}
-    for source in sources_list:
-        if source['url'] not in unique_sources:
-            unique_sources[source['url']] = source
-    
-    # Format output
-    formatted_text = "Sources:\n\n"
-    for i, source in enumerate(unique_sources.values(), 1):
-        formatted_text += f"Source: {source['title']}\n===\n"
-        formatted_text += f"URL: {source['url']}\n===\n"
-        formatted_text += f"Most relevant content from source: {source['content']}\n===\n"
-        if fetch_full_page:
-            # Using rough estimate of 4 characters per token
-            char_limit = max_tokens_per_source * 4
-            # Handle None raw_content
-            raw_content = source.get('raw_content', '')
-            if raw_content is None:
-                raw_content = ''
-                print(f"Warning: No raw_content found for source {source['url']}")
-            if len(raw_content) > char_limit:
-                raw_content = raw_content[:char_limit] + "... [truncated]"
-            formatted_text += f"Full source content limited to {max_tokens_per_source} tokens: {raw_content}\n\n"
-                
-    return formatted_text.strip()
 
-def format_sources(search_results: Dict[str, Any]) -> str:
-    """
-    Format search results into a bullet-point list of sources with URLs.
-    
-    Creates a simple bulleted list of search results with title and URL for each source.
-    
-    Args:
-        search_results (Dict[str, Any]): Search response containing a 'results' key with
-                                        a list of search result objects
-        
-    Returns:
-        str: Formatted string with sources as bullet points in the format "* title : url"
-    """
-    return '\n'.join(
-        f"* {source['title']} : {source['url']}"
-        for source in search_results['results']
-    )
-
-def fetch_raw_content(url: str) -> Optional[str]:
-    """
-    Fetch HTML content from a URL and convert it to markdown format.
-    
-    Uses a 10-second timeout to avoid hanging on slow sites or large pages.
-    
-    Args:
-        url (str): The URL to fetch content from
-        
-    Returns:
-        Optional[str]: The fetched content converted to markdown if successful,
-                      None if any error occurs during fetching or conversion
-    """
-    try:                
-        # Create a client with reasonable timeout
-        with httpx.Client(timeout=10.0) as client:
-            response = client.get(url)
-            response.raise_for_status()
-            return markdownify(response.text)
+def fetch_page_content(url: str) -> str:
+    """Загружает страницу через Playwright и конвертирует HTML → Markdown."""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)
+            page = browser.new_page()
+            page.goto(url, timeout=30000)
+            html = page.content()
+            browser.close()
+            return markdownify(html)
     except Exception as e:
-        print(f"Warning: Failed to fetch full page content for {url}: {str(e)}")
-        return None
+        print(f"[!] Ошибка при загрузке {url}: {e}")
+        return ""
 
-@traceable
-def duckduckgo_search(ru_query: str, max_results: int = 3, fetch_full_page: bool = False) -> Dict[str, List[Dict[str, Any]]]:
+
+def yandex_search(query: str, max_results: int = 5, fetch_full_page: bool = False):
     """
-    Search the web using DuckDuckGo and return formatted results.
-    
-    Uses the DDGS library to perform web searches through DuckDuckGo.
-    
-    Args:
-        query (str): The search query to execute
-        max_results (int, optional): Maximum number of results to return. Defaults to 3.
-        fetch_full_page (bool, optional): Whether to fetch full page content from result URLs. 
-                                         Defaults to False.
-    Returns:
-        Dict[str, List[Dict[str, Any]]]: Search response containing:
-            - results (list): List of search result dictionaries, each containing:
-                - title (str): Title of the search result
-                - url (str): URL of the search result
-                - content (str): Snippet/summary of the content
-                - raw_content (str or None): Full page content if fetch_full_page is True,
-                                            otherwise same as content
+    Выполняет поиск через Yandex Search API и при необходимости парсит страницы.
     """
     try:
-        with DDGS() as ddgs:
-            results = []
-            search_results_ru = list(ddgs.text(ru_query, max_results=max_results))
-            search_results = search_results_ru
-            
-            for r in search_results:
-                url = r.get('href')
-                title = r.get('title')
-                content = r.get('body')
-                
-                if not all([url, title, content]):
-                    print(f"Warning: Incomplete result from DuckDuckGo: {r}")
-                    continue
+        # 🔹 1. Создаём клиента Яндекса
+        client = YandexSearchAPIClient(
+            folder_id=FOLDER_ID,
+            oauth_token=OAUTH_KEY
+            )
 
-                raw_content = content
-                if fetch_full_page:
-                    raw_content = fetch_raw_content(url)
-                
-                # Add result to list
-                result = {
-                    "title": title,
-                    "url": url,
-                    "content": content,
-                    "raw_content": raw_content
-                }
-                results.append(result)
-            
-            return {"results": results}
+        # 🔹 2. Получаем ссылки
+        links = client.get_links(
+            query_text=query,
+            search_type=SearchType.RUSSIAN,
+            n_links=max_results
+        )
+
+        results = []
+        for link in links:
+            result_item = {
+                "title": "",
+                "url": link,
+                "content": "",
+                "raw_content": "",
+            }
+
+            # 🔹 3. Если включено — загружаем контент страницы
+            if fetch_full_page:
+                markdown = fetch_page_content(link)
+                result_item["raw_content"] = markdown
+
+            results.append(result_item)
+
+        return results
+
     except Exception as e:
-        print(f"Error in DuckDuckGo search: {str(e)}")
-        print(f"Full error details: {type(e).__name__}")
-        return {"results": []}
-
+        print(f"Yandex search failed for query '{query}': {e}")
+        return []

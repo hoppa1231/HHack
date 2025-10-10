@@ -5,10 +5,12 @@ from langgraph.graph import START, END, StateGraph
 from langchain_core.messages import HumanMessage, SystemMessage
 from datetime import datetime
 
-from search.utils  import deduplicate_and_format_sources, format_sources, duckduckgo_search
+from search.utils  import yandex_search
 from searcher_agent.state import SummaryState, SummaryStateInput, SummaryStateOutput
 from lib.prompts import query_writer_instructions, summarizer_instructions
 from langchain_deepseek import ChatDeepSeek
+from yandex_search_api.client import SearchType
+
 
 GIGACHAT_API_KEY = os.environ.get("GIGA_AUTH_KEY")
 GIGA_SCOPE = os.environ.get("GIGA_SCOPE")
@@ -91,13 +93,12 @@ def web_research(state: SummaryState):
 
     # Search the web
     try:
-        search_results = duckduckgo_search(state.search_query, max_results=6, fetch_full_page=True)
-        search_str = deduplicate_and_format_sources(search_results, max_tokens_per_source=4096, fetch_full_page=True)
+        search_results = yandex_search(state.search_query, max_results=5, fetch_full_page=True)
         logger.info(f"Successfully fetched web research results for query: {state.search_query}")
     except Exception as e:
         logger.error(f"Web search failed for query: {state.search_query} with error: {e}")
         return {"sources_gathered": state.sources_gathered, "web_research_results": state.web_research_results}
-    return {"sources_gathered": [format_sources(search_results)], "web_research_results": [search_str]}
+    return {"sources_gathered": search_results, "web_research_results": search_results}
 
 def summarize_sources(state: SummaryState):
     """LangGraph node that summarizes web research results.

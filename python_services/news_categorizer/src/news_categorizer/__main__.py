@@ -3,6 +3,7 @@ import time
 import psycopg2
 import logging
 from searcher_agent.searcher import graph 
+from ranker_agent.score_ranker import score_news
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(
@@ -36,10 +37,10 @@ def get_unprocessed_news():
         cur.execute(query)
         return cur.fetchall()
 
-def update_news_resume(news_id: int, resume: str):
-    query = "UPDATE news SET news_resume = %s WHERE id = %s;"
+def update_news_resume(news_id: int, resume: str, news_score: int):
+    query = "UPDATE news SET news_resume = %s, news_score = %s WHERE id = %s;"
     with psycopg2.connect(DSN) as conn, conn.cursor() as cur:
-        cur.execute(query, (resume, news_id))
+        cur.execute(query, (resume, news_score, news_id))
         conn.commit()
 
 def main_loop():
@@ -55,7 +56,9 @@ def main_loop():
                     resume_response = graph.invoke({"news_title": title, "news_content": content})
                     resume = resume_response.get("running_resume", "")
                     logger.info(f"Generated summary: {resume}")
-                    update_news_resume(news_id, resume)
+                    logger.info("Starting news scoring...")
+                    news_score = score_news(title + " " + content[:512], news_id)
+                    update_news_resume(news_id, resume, news_score)
                     logger.info(f"Resume succesfully updated.")
                     time.sleep(2)  # avoid API overload
 

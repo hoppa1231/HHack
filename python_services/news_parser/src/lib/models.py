@@ -27,7 +27,7 @@ class News(Base):
     content = Column(Text)
     image_url = Column(Text)
     description = Column(Text)
-    news_resume = Column(Text)
+    # news_resume = Column(Text)
     category = Column(Enum(NewsCategory, name="news_category"), nullable=False)
     created_at = Column(TIMESTAMP(timezone=True))
     # news_score = Column(Integer)
