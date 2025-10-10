@@ -10,10 +10,33 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 RUN apt-get update && apt-get install -y \
     git \
-    curl \
     build-essential \
     ca-certificates \
-    && rm -rf /var/lib/apt/lists/*
+    wget \
+    gnupg \
+    apt-transport-https \
+    curl \
+    unzip \
+    libnss3 \
+    libxi6 \
+    libxrender1 \
+    libxrandr2 \
+    libxcomposite1 \
+    libxcursor1 \
+    libxdamage1 \
+    libxtst6 \
+    libatk1.0-0 \
+    libatk-bridge2.0-0 \
+    libdrm2 \
+    libgbm1 \
+    libxkbcommon0 \
+    libasound2 \
+    fonts-liberation \
+    libgtk-3-0 \
+    libu2f-udev \
+    libvulkan1 \
+    xdg-utils \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN pip install poetry==2.1.0
 
@@ -28,9 +51,12 @@ RUN poetry config virtualenvs.create false \
     && poetry lock \
     && poetry install --only=main --no-root
 
+
 RUN adduser --disabled-password --gecos '' appuser
 RUN chown -R appuser:appuser /app
 USER appuser
+
+RUN playwright install chromium
 
 EXPOSE 50057
 

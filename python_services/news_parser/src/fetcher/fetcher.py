@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from lib.models import News, NewsCategory
 from lib.sources import NewsSource
 from categorizer_agent.categorizer import categorize_news
-from ranker_agent.score_ranker import score_news
+# from ranker_agent.score_ranker import score_news
 from .extract_image import extract_image_url_from_enclosures
 # from searcher_agent.searcher import graph
 
@@ -62,7 +62,7 @@ class NewsFetcher:
                         source=source,
                         published=published or datetime.datetime.utcnow(),
                         content=news_content,
-                        news_resume=news_description or news_content,
+                        # news_resume=news_description or news_content,
                         image_url=news_image,
                         description=news_description,
                         category=NewsCategory(news_category) if news_category in NewsCategory.__members__ else NewsCategory.другое,

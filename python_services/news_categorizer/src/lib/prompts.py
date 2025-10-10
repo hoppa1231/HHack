@@ -47,9 +47,9 @@ When creating a resume:
 5. The text of your article should be in russian
 6. The text size of your resume should be about or under 2000 words. 
 7. In the end of the article, provide a list of sources used in the format: 
-    1. title [url] 
-    2. title [url] 
-    3. title [url] 
+    1. [title](url) 
+    2. [title](url)
+    3. [title](url)
     ...           
 8. Если в найденных источниках нет информации по новости, то:
     8.1. Если исходный текст есть, то оставь его неизменным
