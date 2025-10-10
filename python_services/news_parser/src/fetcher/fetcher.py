@@ -62,6 +62,7 @@ class NewsFetcher:
                         source=source,
                         published=published or datetime.datetime.utcnow(),
                         content=news_content,
+                        news_resume=news_description or news_content,
                         image_url=news_image,
                         description=news_description,
                         category=NewsCategory(news_category) if news_category in NewsCategory.__members__ else NewsCategory.другое,

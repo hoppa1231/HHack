@@ -278,6 +278,11 @@
           "source": {
             "type": "string"
           },
+          "resume": {
+            "type": "string",
+            "nullable": true,
+            "description": "Short resume of the article content"
+          },
           "published_at": {
             "type": "string",
             "format": "date-time"

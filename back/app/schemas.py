@@ -75,6 +75,7 @@ class NewsItem(BaseModel):
     image: Optional[str] = None
     description: Optional[str] = None
     link: Optional[str] = None
+    resume: Optional[str] = None
 
 
 class NewsListResponse(BaseModel):

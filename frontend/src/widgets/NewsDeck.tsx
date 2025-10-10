@@ -71,7 +71,7 @@ export default function NewsDeck({ news = sample }: { news?: News[] }) {
                         {item.title}
                       </h3>
                       <p className="text-sm text-slate-600 dark:text-slate-300 mt-3 leading-relaxed">
-                        {item.summary}
+                        {item.resume ?? item.summary}
                       </p>
                     </div>
                     {item.link && (

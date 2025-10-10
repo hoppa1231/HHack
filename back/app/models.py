@@ -30,6 +30,7 @@ class News(db.Model):
     content = db.Column(db.Text)
     image_url = db.Column(db.Text)
     description = db.Column(db.Text)
+    news_resume = db.Column(db.Text)
     category = db.Column(news_category_enum, nullable=False)
     # news_score = db.Column(db.Float, nullable=True, default=0.0)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
