@@ -4,6 +4,7 @@ export type News = {
   summary: string;
   category: string;
   source: string;
+  resume?: string | null;
   newsScore?: number | null;
   publishedAt?: string;
   image?: string | null;

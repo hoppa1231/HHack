@@ -50,7 +50,7 @@ export default function NewsListItem({
             {item.title}
           </h3>
           <p className="text-sm leading-relaxed text-white/70 line-clamp-3">
-            {item.summary}
+            {item.resume ?? item.summary}
           </p>
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 text-sm text-white/60">
