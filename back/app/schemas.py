@@ -2,7 +2,7 @@
 from enum import Enum
 from typing import List, Optional, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 CategoryType = Literal[
     'политика', 'экономика', 'спорт', 'технологии', 
@@ -33,9 +33,25 @@ class NewsPeriod(str, Enum):
 
 
 class NewsQueryParams(BaseModel):
-    category: Optional[str] = Field(default=None, description="Категория новости")
-    period: Optional[NewsPeriod] = Field(default=None, description="Период выборки")
+    category: Optional[str] = Field(default=None, description="��⥣��� ������")
+    period: Optional[NewsPeriod] = Field(default=None, description="��ਮ� �롮ਨ")
+    sources: Optional[List[str]] = Field(
+        default=None,
+        description="Sources to include in the response",
+    )
     limit: int = Field(default=50, ge=1, le=200, description="Максимальное количество новостей")
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_sources(cls, values: dict) -> dict:
+        sources = values.get("sources")
+        if isinstance(sources, str):
+            parsed = [item.strip() for item in sources.split(",") if item.strip()]
+            values["sources"] = parsed or None
+        elif isinstance(sources, list):
+            parsed = [str(item).strip() for item in sources if str(item).strip()]
+            values["sources"] = parsed or None
+        return values
 
     def cutoff(self) -> Optional[datetime]:
         if not self.period:
@@ -67,5 +83,8 @@ class NewsListResponse(BaseModel):
 
 class NewsDetail(NewsItem):
     content: Optional[str] = None
+
+
+
 
 

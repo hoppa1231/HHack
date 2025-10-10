@@ -3,7 +3,7 @@ import datetime
 import logging
 from bs4 import BeautifulSoup
 from lib.models import News, NewsCategory
-from lib.sources import RSS_FEEDS
+from lib.sources import NewsSource
 from categorizer_agent.categorizer import categorize_news
 from ranker_agent.score_ranker import score_news
 from .extract_image import extract_image_url_from_enclosures
@@ -17,7 +17,11 @@ logging.basicConfig(
 
 class NewsFetcher:
     def __init__(self, feeds=None):
-        self.feeds = feeds or RSS_FEEDS
+        if feeds is None:
+            news_source = NewsSource()
+            self.feeds = news_source.get_feed_urls()
+        else:
+            self.feeds = feeds
         logger.info("NewsFetcher initialized with %d sources", len(self.feeds))
 
     def clean_html(self, raw_html: str) -> str:

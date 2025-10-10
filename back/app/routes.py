@@ -39,6 +39,12 @@ def news_detail(news_id: int):
     return jsonify(item.model_dump(mode="json"))
 
 
+@main_bp.get("/sources")
+def list_sources():
+    sources = news_service.get_sources()
+    return jsonify(sources)
+
+
 @main_bp.post("/register")
 def register():
     payload = request.get_json(silent=True) or {}

@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from sqlalchemy import nullslast
+from sqlalchemy.exc import SQLAlchemyError
 
 from app.models import News
 from app.schemas import NewsDetail, NewsItem, NewsQueryParams
@@ -42,6 +43,9 @@ class NewsService:
         if params.category:
             query = query.filter(News.category == params.category)
 
+        if params.sources:
+            query = query.filter(News.source.in_(params.sources))
+
         cutoff = params.cutoff()
         if cutoff:
             query = query.filter(News.published >= cutoff)
@@ -79,6 +83,41 @@ class NewsService:
             description=row.description,
             link=row.link,
         )
+
+    def get_sources(self) -> List[dict]:
+        feeds = []
+        try:
+            from lib.sources import NewsSource
+
+            feeds = NewsSource().feeds
+        except ModuleNotFoundError:
+            feeds = []
+        except Exception:
+            feeds = []
+
+        try:
+            db_sources = {
+                value
+                for (value,) in News.query.with_entities(News.source)
+                .filter(News.source.isnot(None))
+                .distinct()
+                .all()
+                if value
+            }
+        except SQLAlchemyError:
+            db_sources = set()
+
+        result = [
+            {"name": feed.name, "chosen": feed.chosen, "available": feed.name in db_sources}
+            for feed in feeds
+        ]
+
+        extra = [
+            {"name": source, "chosen": True, "available": True}
+            for source in sorted(db_sources - {feed.name for feed in feeds})
+        ]
+
+        return result + extra
 
     def _image_for(self, category: Optional[str], index: int) -> str:
         if category and category in CATEGORY_PLACEHOLDERS:

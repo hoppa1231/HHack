@@ -1,83 +1,174 @@
 {
-  "openapi": "3.0.0",
+  "openapi": "3.0.1",
   "info": {
     "title": "News API",
-    "description": "API для работы с новостями и пользователями",
+    "description": "HTTP API for browsing aggregated news articles and managing user access.",
     "version": "1.0.0"
   },
   "servers": [
     {
       "url": "http://localhost:5000/api",
-      "description": "Development server"
+      "description": "Local development server"
     }
   ],
   "paths": {
-    "/news": {
-      "post": {
-        "summary": "Получить новости",
-        "description": "Возвращает список новостей за указанный период для пользователя",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/NewsRequest"
-              }
-            }
-          }
-        },
+    "/health": {
+      "get": {
+        "summary": "Service health check",
+        "operationId": "health",
         "responses": {
           "200": {
-            "description": "Успешный ответ со списком новостей",
+            "description": "Service is reachable",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/NewsResponse"
+                  "$ref": "#/components/schemas/HealthResponse"
                 }
               }
             }
-          },
-          "422": {
-            "description": "Ошибка валидации входных данных"
           }
         }
       }
     },
-    "/summary": {
-      "post": {
-        "summary": "Получить сводку новости",
-        "description": "Возвращает полную сводку конкретной новости",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SummaryRequest"
-              }
+    "/news": {
+      "get": {
+        "summary": "List news",
+        "operationId": "listNews",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by exact category name",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "period",
+            "in": "query",
+            "description": "Filter by relative publish period",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/NewsPeriod"
+            }
+          },
+          {
+            "name": "sources",
+            "in": "query",
+            "description": "Comma separated list of sources to include",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "style": "form",
+            "explode": false
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Maximum number of articles to return",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 200,
+              "default": 50
             }
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": "Успешный ответ со сводкой новости",
+            "description": "A list of news items",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SummaryResponse"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NewsItem"
+                  }
                 }
               }
             }
           },
           "422": {
-            "description": "Ошибка валидации входных данных"
+            "description": "Invalid filter parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/news/{news_id}": {
+      "get": {
+        "summary": "News item details",
+        "operationId": "newsDetail",
+        "parameters": [
+          {
+            "name": "news_id",
+            "in": "path",
+            "required": true,
+            "description": "Unique news identifier",
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Full news article data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NewsDetail"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "News item not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sources": {
+      "get": {
+        "summary": "List available sources",
+        "operationId": "listSources",
+        "responses": {
+          "200": {
+            "description": "Available RSS feeds",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SourceInfo"
+                  }
+                }
+              }
+            }
           }
         }
       }
     },
     "/register": {
       "post": {
-        "summary": "Регистрация пользователя",
-        "description": "Регистрирует нового пользователя и возвращает токен",
+        "summary": "Register new user",
+        "operationId": "register",
         "requestBody": {
           "required": true,
           "content": {
@@ -90,7 +181,7 @@
         },
         "responses": {
           "200": {
-            "description": "Успешная регистрация",
+            "description": "Registration successful",
             "content": {
               "application/json": {
                 "schema": {
@@ -100,15 +191,22 @@
             }
           },
           "422": {
-            "description": "Ошибка валидации входных данных"
+            "description": "Invalid registration data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
     },
     "/login": {
       "post": {
-        "summary": "Авторизация пользователя",
-        "description": "Авторизует пользователя и возвращает токен",
+        "summary": "User login",
+        "operationId": "login",
         "requestBody": {
           "required": true,
           "content": {
@@ -121,7 +219,7 @@
         },
         "responses": {
           "200": {
-            "description": "Успешная авторизация",
+            "description": "Authentication successful",
             "content": {
               "application/json": {
                 "schema": {
@@ -131,7 +229,14 @@
             }
           },
           "422": {
-            "description": "Ошибка валидации входных данных"
+            "description": "Invalid credentials payload",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -139,117 +244,169 @@
   },
   "components": {
     "schemas": {
-      "Register": {
+      "HealthResponse": {
         "type": "object",
-        "required": ["name", "preferences"],
+        "properties": {
+          "status": {
+            "type": "string",
+            "example": "ok"
+          }
+        }
+      },
+      "NewsItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "title",
+          "summary",
+          "category",
+          "source"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "published_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "image": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "link": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          }
+        }
+      },
+      "NewsDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/NewsItem"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "content": {
+                "type": "string",
+                "nullable": true
+              }
+            }
+          }
+        ]
+      },
+      "SourceInfo": {
+        "type": "object",
+        "required": [
+          "name",
+          "chosen",
+          "available"
+        ],
         "properties": {
           "name": {
-            "type": "string",
-            "description": "имя пользователя"
+            "type": "string"
+          },
+          "chosen": {
+            "type": "boolean",
+            "description": "True when the source is selected by default"
+          },
+          "available": {
+            "type": "boolean",
+            "description": "True when recent articles from the source are present in storage"
+          }
+        }
+      },
+      "Register": {
+        "type": "object",
+        "required": [
+          "name",
+          "password",
+          "preferences"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           },
           "preferences": {
             "type": "array",
             "items": {
               "type": "string"
-            },
-            "description": "Список тегов предпочтений"
+            }
           }
         }
       },
       "Login": {
         "type": "object",
-        "required": ["name"],
+        "required": [
+          "name",
+          "password"
+        ],
         "properties": {
           "name": {
-            "type": "string",
-            "description": "имя пользователя"
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
           }
         }
       },
       "TokenResponse": {
         "type": "object",
-        "required": ["access_token"],
+        "required": [
+          "access_token"
+        ],
         "properties": {
           "access_token": {
-            "type": "string",
-            "description": "JWT-токен для авторизации"
+            "type": "string"
           }
         }
       },
       "NewsPeriod": {
         "type": "string",
-        "enum": ["day", "week", "month"],
-        "description": "Период за который нужно получить сводку новостей"
+        "enum": [
+          "day",
+          "week",
+          "month"
+        ]
       },
-      "NewsRequest": {
+      "ErrorResponse": {
         "type": "object",
-        "required": ["user_id", "news_period"],
         "properties": {
-          "user_id": {
-            "type": "integer",
-            "description": "id пользователя"
-          },
-          "news_period": {
-            "$ref": "#/components/schemas/NewsPeriod"
-          }
-        }
-      },
-      "News": {
-        "type": "object",
-        "required": ["news_id", "img_url", "header", "mini_description"],
-        "properties": {
-          "news_id": {
-            "type": "integer",
-            "description": "id новости"
-          },
-          "img_url": {
-            "type": "string",
-            "description": "Ссылка на картинку новости"
-          },
-          "header": {
-            "type": "string",
-            "description": "Заголовок новости"
-          },
-          "mini_description": {
-            "type": "string",
-            "description": "Краткое описание новости"
-          }
-        }
-      },
-      "NewsResponse": {
-        "type": "object",
-        "required": ["news"],
-        "properties": {
-          "news": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/News"
-            },
-            "description": "Список новостей"
-          }
-        }
-      },
-      "SummaryRequest": {
-        "type": "object",
-        "required": ["news_id"],
-        "properties": {
-          "news_id": {
-            "type": "integer",
-            "description": "id новости"
-          }
-        }
-      },
-      "SummaryResponse": {
-        "type": "object",
-        "required": ["header", "summary"],
-        "properties": {
-          "header": {
-            "type": "string",
-            "description": "Заголовок новости"
-          },
-          "summary": {
-            "type": "string",
-            "description": "Сводка новости"
+          "detail": {
+            "description": "Error details",
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            ]
           }
         }
       }
