@@ -146,3 +146,9 @@ docker-compose up -d --force-recreate --build
 ```sh
 docker-compose build --no-cache
 ```
+
+- Fix: service "database_migrations" didn't complete successfully: exit 1
+
+```sh
+(Get-Content .\init_db\init_news_db.sh) -join "`n" | Set-Content -NoNewline -Encoding utf8 .\init_db\init_news_db.sh
+```

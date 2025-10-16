@@ -58,7 +58,7 @@ def extract_image_url_from_enclosures(entry):
     return None
 
 
-def _first_image_from_html(cls, html: str, base_href: str | None = None) -> str | None:
+def _first_image_from_html(html: str, base_href: str | None = None) -> str | None:
     """Достаёт первую осмысленную картинку из HTML-фрагмента (<img>, <picture>/<source>, data-src, srcset)."""
     if not html:
         return None
@@ -66,24 +66,13 @@ def _first_image_from_html(cls, html: str, base_href: str | None = None) -> str 
 
     # 1) <picture> с <source srcset=...> — берём самый широкий из srcset
     for pic in soup.find_all("picture"):
-        # сначала источники
-        for source in pic.find_all("source"):
-            url = cls._pick_best_from_srcset(source.get("srcset"))
-            if url:
-                return urljoin(base_href or "", url)
         # затем сам <img> внутри picture
         img = pic.find("img")
         if img:
-            url = (cls._pick_best_from_srcset(img.get("srcset"))
-                    or img.get("src") or img.get("data-src") or img.get("data-original"))
-            if url:
-                return urljoin(base_href or "", url)
+            return urljoin(base_href or "", img.get("src") or "")
 
     # 2) Обычные <img> (в т.ч. Habr: <img src="https://habrastorage.org/...">)
     for img in soup.find_all("img"):
-        url = (cls._pick_best_from_srcset(img.get("srcset"))
-                or img.get("src") or img.get("data-src") or img.get("data-original"))
-        if url:
-            return urljoin(base_href or "", url)
+        return urljoin(base_href or "", img.get("src") or "")
 
     return None

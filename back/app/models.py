@@ -42,13 +42,13 @@ class News(db.Model):
     )
 
     def summary(self, length: int = 320) -> str:
-        if not self.content:
+        return self.__formating(self.news_resume or self.content, length)
+    
+    def __formating(self, content: str, length: int = 320) -> str:
+        if not content:
             return ""
-        text = self.content.strip()
-        if len(text) <= length:
-            return text
-        truncated = text[:length].rsplit(" ", 1)[0]
-        return truncated + "..."
+        text = content.strip()
+        return text
 
 
 class User(db.Model):
