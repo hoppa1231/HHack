@@ -6,31 +6,18 @@ HHack is a containerized news-intelligence system composed of independently depl
 
 External RSS publishers provide unstructured feed entries. GigaChat supplies classification and enrichment capabilities. Users consume structured news through the backend API and React dashboard.
 
-```mermaid
-flowchart TB
-    subgraph External
-        RSS["RSS Publishers"]
-        LLM["GigaChat API"]
-    end
+![HHack system architecture](images/architecture.png)
 
-    subgraph Compose["Docker Compose Network"]
-        Parser["news_parser\nScheduled ingestion"]
-        Categorizer["news_categorizer\nSummary and ranking"]
-        Migration["database_migrations\nSchema lifecycle"]
-        DB[("PostgreSQL + pgvector")]
-        Backend["backend\nFlask + Gunicorn"]
-        Frontend["frontend\nReact + nginx"]
-    end
+The architecture is organized into four trust and responsibility zones:
 
-    RSS --> Parser
-    Parser <--> LLM
-    Parser --> DB
-    Categorizer <--> LLM
-    Categorizer <--> DB
-    Migration --> DB
-    DB --> Backend
-    Backend --> Frontend
-```
+1. **Sources & Ingestion** receives public RSS feeds and converts them into internal article records.
+2. **Processing** normalizes content and applies GigaChat categorization.
+3. **Intelligence & Storage** persists structured data and runs asynchronous summary and ranking enrichment.
+4. **Delivery** exposes the trusted dataset through the Flask REST API and React dashboard.
+
+The migration service is intentionally outside the runtime data path: it manages PostgreSQL schema evolution before dependent services start.
+
+The lower capability strip describes the production target state. The current Compose deployment implements service isolation, API boundaries, persistent storage, and health-based startup. Metrics, distributed tracing, automated backups, replication, and horizontal orchestration are explicit future work rather than claimed current capabilities.
 
 ## Service boundaries
 

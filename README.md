@@ -40,20 +40,9 @@ HHack implements a staged pipeline:
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    RSS["RSS Sources"] --> Fetcher["News Fetcher"]
-    Fetcher --> Pipeline["Processing Pipeline"]
-    Pipeline --> Classifier["GigaChat Categorization"]
-    Classifier --> DB[("PostgreSQL + pgvector")]
-    DB --> Enrichment["Summary & Ranking Worker"]
-    Enrichment --> DB
-    DB --> API["Flask REST API"]
-    API --> UI["React Dashboard"]
-    Migrations["yoyo Migration Service"] --> DB
-```
+![HHack AI News Intelligence Platform architecture](docs/images/architecture.png)
 
-See [Architecture](docs/architecture.md) for service boundaries and deployment details.
+The diagram separates untrusted ingestion, internal processing, trusted storage, and delivery zones. Its lower capability strip represents the target production direction; health checks exist today, while full metrics, tracing, backups, and horizontal orchestration remain roadmap items. See [Architecture](docs/architecture.md) for service boundaries and deployment details.
 
 ## System Components
 
