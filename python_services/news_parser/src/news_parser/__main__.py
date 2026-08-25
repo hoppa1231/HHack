@@ -16,12 +16,13 @@ REQUIRED_ENV_VARS = [
     "GIGA_AUTH_KEY",
     "GIGA_SCOPE"
 ]
+SCHEDULE_INTERVAL_MINUTES = int(os.getenv("NEWS_FETCH_INTERVAL_MINUTES", "5"))
 
 missing_vars = [var for var in REQUIRED_ENV_VARS if not os.getenv(var)]
 if missing_vars:
         raise EnvironmentError(f"Missing required environment variables: {', '.join(missing_vars)}")
 
-def job():
+def job() -> None:
     try:
         postgres_url = os.getenv("POSTGRES_NEWS_URL")
 
@@ -36,14 +37,17 @@ def job():
         db.insert_news(news_list)
         logger.info("Cycle finished: %d news items processed", len(news_list))
 
-    except Exception as e:
-        logger.error("Error in scheduled job: %s", e, exc_info=True)
+    except Exception:
+        logger.exception("Scheduled ingestion cycle failed")
 
-def main():
-    logger.info("Starting news aggregator with 5-minute scheduler")
+def main() -> None:
+    logger.info(
+        "Starting news intelligence ingestion worker (interval: %d minutes)",
+        SCHEDULE_INTERVAL_MINUTES,
+    )
 
-    # schedule job every 5 minutes
-    schedule.every(5).minutes.do(job)
+    # Keep polling cadence configurable without rebuilding the worker image.
+    schedule.every(SCHEDULE_INTERVAL_MINUTES).minutes.do(job)
 
     # run immediately at start
     job()
